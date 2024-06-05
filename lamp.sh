@@ -24,24 +24,31 @@ if [ "$choice" = "1" ]; then
   read -p "Confirm the password: " CONFIRM_PASSWORD
 # IF statement for setting pw
   if [ "$ROOT_PASSWORD" = "$CONFIRM_PASSWORD" ]; then
-    sudo mysql_secure_installation <<EOF
-y
-$ROOT_PASSWORD
-$ROOT_PASSWORD
-0
-y
-y
-y
-EOF
+#sudo mysql_secure_installation <<EOF
+#y
+#$ROOT_PASSWORD
+#$ROOT_PASSWORD
+#0
+#y
+#y
+#y
+#EOF
+#sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '$ROOT_PASSWORD'; FLUSH PRIVILEGES;"
+#sudo mysql -e "DELETE FROM mysql.user WHERE User='';"
+#sudo mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+#sudo mysql -e "DROP DATABASE IF EXISTS test;"
+#sudo mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+#sudo mysql -e "FLUSH PRIVILEGES;"
+
 echo "MySQL Installed and configured !"
  else
     echo "Passwords do not match. Please try again."
   fi
 # Closing the IF statement
 
-sudo mysql
-...
-exit
+#sudo mysql
+#...
+#exit
 
 echo "Installing PHP"
 
@@ -58,22 +65,25 @@ echo "Creating Virtual Host"
 
 sudo mkdir /var/www/hristiyan
 sudo chown -R $USER:$USER /var/www/hristiyan
-sudo nano /etc/apache2/sites-available/hristiyan.conf
 
-DOMAIN="hristiyan"
+# sudo touch /etc/apache2/sites-available/hristiyan.conf
+
+DOMAIN="localhost"
 DOCUMENT_ROOT="/var/www/$DOMAIN"
 
-echo "<VirtualHost *:80>
-    ServerName $DOMAIN
-    ServerAlias www.$DOMAIN
-    ServerAdmin webmaster@localhost
-    DocumentRoot $DOCUMENT_ROOT
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
+echo -e "<VirtualHost *:80>\n
+    ServerName $DOMAIN\n
+    ServerAlias www.$DOMAIN\n
+    ServerAdmin webmaster@localhost\n
+    DocumentRoot $DOCUMENT_ROOT\n
+    ErrorLog ${APACHE_LOG_DIR}/error.log\n
+    CustomLog ${APACHE_LOG_DIR}/access.log combined\n
     </VirtualHost>" | sudo tee /etc/apache2/sites-available/$DOMAIN.conf
- #tva e da suzdam file i da go otvorq s nano, a s | (prava cherta)  da pisha direktno v nego
-#Save and Close - sudo nano -w
-sudo nano -w /etc/apache2/sites-available/$DOMAIN.conf
+
+#tva e da suzdam file i da go otvorq s nano, a s | (prava cherta)  da pisha direktno v nego\n
+#Save and Close - sudo nano -w\n
+
+# sudo nano -w /etc/apache2/sites-available/$DOMAIN.conf
 
 sudo a2ensite hristiyan
   fi
@@ -98,24 +108,27 @@ echo "Creating Virtual Host"
 
 sudo mkdir /var/www/hristiyan
 sudo chown -R $USER:$USER /var/www/hristiyan
-sudo nano /etc/apache2/sites-available/hristiyan.conf
+
+# sudo nano /etc/apache2/sites-available/hristiyan.conf
 
 DOMAIN="hristiyan"
 DOCUMENT_ROOT="/var/www/$DOMAIN"
 
-echo "<VirtualHost *:80>
-    ServerName $DOMAIN
-    ServerAlias www.$DOMAIN
-    ServerAdmin webmaster@localhost
-    DocumentRoot $DOCUMENT_ROOT
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
+echo "<VirtualHost *:80>\n
+    ServerName $DOMAIN\n
+    ServerAlias www.$DOMAIN\n
+    ServerAdmin webmaster@localhost\n
+    DocumentRoot $DOCUMENT_ROOT\n
+    ErrorLog ${APACHE_LOG_DIR}/error.log\n
+    CustomLog ${APACHE_LOG_DIR}/access.log combined\n
     </VirtualHost>" | sudo tee /etc/apache2/sites-available/$DOMAIN.conf
- #tva e da suzdam file i da go otvorq s nano, a s |(prava cherta) da pisha direktno v nego
-#Save and Close - sudo nano -w
-sudo nano -w /etc/apache2/sites-available/$DOMAIN.conf
 
-sudo a2ensite hristiyan
+# tva e da suzdam file i da go otvorq s nano, a s |(prava cherta) da pisha direktno v nego
+# Save and Close - sudo nano -w
+
+# sudo nano -w /etc/apache2/sites-available/$DOMAIN.conf
+
+sudo a2ensite $DOMAIN
 sudo a2dissite 000-default
 sudo systemctl reload apache2
 
@@ -187,27 +200,27 @@ sudo chown -R $USER:USER /var/www/hristiyan
 DOMAIN=“hristiyan”
 DOCUMENT_ROOT=“/var/www/$DOMAIN”
 
-echo “server {
-	listen 80;
-	server name $DOMAIN www.$DOMAIN;
-
-	root $DOCUMENT_ROOT;
-	index index.php index.html index.htm
-
-	location / {
-		try_files \$uri \$uri/ =404;
-	}
-
-	location ~ \\.php\$ {
-		include snippets/fastcgi-php.conf;
-		fastcgi_pass unix:/run/php/php7.4-fpm.sock;
-	}
-
-	location ~ /\\.ht {
-		deny all;
-	}
-	error_log /var/log/nginx/$DOMAIN.error.log;
-	access_log /var/log/nginx/$DOMAIN.access.log;
+echo -e “server {\n
+	listen 80;\n
+	server name $DOMAIN www.$DOMAIN;\n
+\n
+	root $DOCUMENT_ROOT;\n
+	index index.php index.html index.htm\n
+\n
+	location / {\n
+		try_files \$uri \$uri/ =404;\n
+	}\n
+\n
+	location ~ \\.php\$ {\n
+		include snippets/fastcgi-php.conf;\n
+		fastcgi_pass unix:/run/php/php7.4-fpm.sock;\n
+	}\n
+\n
+	location ~ /\\.ht {\n
+		deny all;\n
+	}\n
+	error_log /var/log/nginx/$DOMAIN.error.log;\n
+	access_log /var/log/nginx/$DOMAIN.access.log;\n
 }" | sudo tee /etc/nginx/sites-available/$DOMAIN
 
 sudo ln -s /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
@@ -215,18 +228,17 @@ sudo ln -s /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
 sudo systemctl restart nginx
 
 #Checking if things are working
-nano /var/www/hristiyan/index.html
-echo "<html>
-  <head>
-    <title>your_domain website</title>
-  </head>
-  <body>
-    <h1>Hello, LAMP Installed</h1>
-
-    <p>This is the landing page of <strong>Hristiyan</strong>.</p>
+touch /var/www/hristiyan/index.html
+echo -e "<html>\n
+  <head>\n
+    <title>your_domain website</title>\n
+  </head>\n
+  <body>\n
+    <h1>Hello, LAMP Installed</h1>\n
+\n
+    <p>This is the landing page of <strong>Hristiyan</strong>.</p>\n
+</body>" > /var/www/hristiyan/index.html
 
 else
   echo "Invalid choice. Please try again."
 fi
-
-
